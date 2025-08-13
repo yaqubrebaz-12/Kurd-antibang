@@ -36,10 +36,10 @@ gui.Parent = plr:WaitForChild("PlayerGui")
 
 btn.Size = UDim2.new(0, 100, 0, 50)
 btn.Position = UDim2.new(0.5, -50, 0.5, -25)
-btn.Text = "🔴"
+btn.Text = "کلیک"
 btn.BackgroundColor3 = Color3.new(1, 0, 0)
 btn.TextColor3 = Color3.new(1, 1, 1)
-btn.TextSize = 20
+btn.TextSize = 23
 btn.Draggable = true
 btn.Parent = gui
 
@@ -54,7 +54,7 @@ btnst2.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
 btnst2.LineJoinMode = Enum.LineJoinMode.Round
 
 for _, gaze in ipairs(workspace:GetDescendants()) do
-	if gaze:IsA("Part") and gaze.Name == "gaze" and gaze.Transparency == 0.5 then
+	if gaze:IsA("Part") and gaze.Name == "Gaze" and gaze.Transparency == 0.5 then
         workspace.Gaze:Destroy()
 	end
 end
@@ -87,7 +87,7 @@ local function toggleTween()
         stopVelLoop()
         local tweenBack = createTween(CFrame.new(lastPos))
         tweenBack:Play()
-		btn.Text = "بۆستە"
+		btn.Text = "now"
         btn.BackgroundColor3 = Color3.new(0.5, 0.5, 0.5)
         tweenBack.Completed:Wait()
 		btn.Text = "🔴"
@@ -109,7 +109,7 @@ local function toggleTween()
         part.Anchored = true
         part.CanCollide = false
         part.Transparency = 0.5
-        part.Name = "T7"
+        part.Name = "Gaze"
         part.Parent = game.Workspace
         workspace.CurrentCamera.CameraSubject = part
         toggle = true
@@ -117,7 +117,7 @@ local function toggleTween()
         workspace.FallenPartsDestroyHeight = 0/0
         local tweenToTarget = createTween(CFrame.new(targetPos))
         tweenToTarget:Play()
-        btn.Text = "بۆستە"
+        btn.Text = "now"
         btn.BackgroundColor3 = Color3.new(0.5, 0.5, 0.5)
         tweenToTarget.Completed:Wait()
 		btn.Text = "🟢"
@@ -127,5 +127,4 @@ local function toggleTween()
     end
 end
 
-btn.MouseButton1Click:Conn
-ect(toggleTween)
+btn.MouseButton1Click:Connect(toggleTween)
