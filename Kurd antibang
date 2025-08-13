@@ -1,0 +1,131 @@
+-- https://scriptblox.com/script/Universal-Script-Gaze-Anti-Bypass-but-Kind-of-Better-29119
+
+local TeleportTime = 0.1
+
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local TweenService = game:GetService("TweenService")
+
+local localPlayer = Players.LocalPlayer
+
+local function resetCameraSubject()
+	if workspace.CurrentCamera and localPlayer.Character then
+		local humanoid = localPlayer.Character:FindFirstChildWhichIsA("Humanoid")
+		if humanoid then
+			workspace.CurrentCamera.CameraSubject = humanoid
+		end
+	end
+end
+
+local plr = Players.LocalPlayer
+local character = plr.Character or plr.CharacterAdded:Wait()
+local hrp = character:WaitForChild("HumanoidRootPart")
+local gui = Instance.new("ScreenGui")
+local btn = Instance.new("TextButton")
+local btnst = Instance.new("UIStroke")
+local btnst2 = Instance.new("UIStroke")
+
+local toggle = false
+local lastPos = hrp.Position
+local targetPos = Vector3.new(0, -80000000, 0)
+local db = false
+local velConn
+local lastS
+
+gui.Parent = plr:WaitForChild("PlayerGui")
+
+btn.Size = UDim2.new(0, 100, 0, 50)
+btn.Position = UDim2.new(0.5, -50, 0.5, -25)
+btn.Text = "🔴"
+btn.BackgroundColor3 = Color3.new(1, 0, 0)
+btn.TextColor3 = Color3.new(1, 1, 1)
+btn.TextSize = 20
+btn.Draggable = true
+btn.Parent = gui
+
+btnst.Thickness = 3.5
+btnst.Parent = btn
+btnst.ApplyStrokeMode = Enum.ApplyStrokeMode.Contextual
+btnst.LineJoinMode = Enum.LineJoinMode.Miter
+
+btnst2.Thickness = 5
+btnst2.Parent = btn
+btnst2.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
+btnst2.LineJoinMode = Enum.LineJoinMode.Round
+
+for _, gaze in ipairs(workspace:GetDescendants()) do
+	if gaze:IsA("Part") and gaze.Name == "gaze" and gaze.Transparency == 0.5 then
+        workspace.Gaze:Destroy()
+	end
+end
+
+local function createTween(targetCFrame)
+    local tweenInfo = TweenInfo.new(TeleportTime, Enum.EasingStyle.Linear, Enum.EasingDirection.Out)
+    return TweenService:Create(hrp, tweenInfo, {CFrame = targetCFrame})
+end
+
+local function startVelLoop()
+    velConn = RunService.Heartbeat:Connect(function()
+        if toggle then
+            hrp.Velocity = Vector3.new(0, 0, 0)
+        end
+    end)
+end
+
+local function stopVelLoop()
+    if velConn then
+        velConn:Disconnect()
+        velConn = nil
+    end
+end
+
+local function toggleTween()
+    if db then return end
+    if toggle then
+	    db = true
+        toggle = false
+        stopVelLoop()
+        local tweenBack = createTween(CFrame.new(lastPos))
+        tweenBack:Play()
+		btn.Text = "بۆستە"
+        btn.BackgroundColor3 = Color3.new(0.5, 0.5, 0.5)
+        tweenBack.Completed:Wait()
+		btn.Text = "🔴"
+        btn.BackgroundColor3 = Color3.new(1, 0, 0)
+		db = false
+        workspace.FallenPartsDestroyHeight = -500
+        resetCameraSubject()
+        for _, gaze in ipairs(workspace:GetDescendants()) do
+		    if gaze:IsA("Part") and gaze.Name == "Gaze" and gaze.Transparency == 0.5 then
+                workspace.Gaze:Destroy()
+			end
+        end
+    else
+	db = true
+    lastPos = hrp.Position
+    local part = Instance.new("Part")
+        part.Size = Vector3.new(4, 5, 4)
+        part.Position = lastPos
+        part.Anchored = true
+        part.CanCollide = false
+        part.Transparency = 0.5
+        part.Name = "T7"
+        part.Parent = game.Workspace
+        workspace.CurrentCamera.CameraSubject = part
+        toggle = true
+        wait()
+        workspace.FallenPartsDestroyHeight = 0/0
+        local tweenToTarget = createTween(CFrame.new(targetPos))
+        tweenToTarget:Play()
+        btn.Text = "بۆستە"
+        btn.BackgroundColor3 = Color3.new(0.5, 0.5, 0.5)
+        tweenToTarget.Completed:Wait()
+		btn.Text = "🟢"
+        btn.BackgroundColor3 = Color3.new(0, 1, 0)
+		db = false
+        startVelLoop()
+    end
+end
+
+btn.MouseButton1Click:Conn
+ect(toggleTween)
