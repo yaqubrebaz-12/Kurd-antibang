@@ -1,5 +1,5 @@
 -- Table to store player's last checkpoint
-local checkpoints = {}
+local checkpoints = {350}
 
 game.Players.PlayerAdded:Connect(function(player)
     -- Create leaderstats for checkpoint tracking
