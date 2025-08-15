@@ -1,0 +1,38 @@
+-- Table to store player's last checkpoint
+local checkpoints = {}
+
+game.Players.PlayerAdded:Connect(function(player)
+    -- Create leaderstats for checkpoint tracking
+    local leaderstats = Instance.new("Folder")
+    leaderstats.Name = "leaderstats"
+    leaderstats.Parent = player
+    
+    local stage = Instance.new("IntValue")
+    stage.Name = "Stage"
+    stage.Value = 1
+    stage.Parent = leaderstats
+    
+    -- When player respawns, move them to last checkpoint
+    player.CharacterAdded:Connect(function(character)
+        local checkpointNumber = stage.Value
+        local checkpoint = workspace:FindFirstChild("Checkpoint" .. checkpointNumber)
+        if checkpoint then
+            character:SetPrimaryPartCFrame(checkpoint.CFrame + Vector3.new(0, 3, 0))
+        end
+    end)
+end)
+
+-- Detect when player touches a checkpoint
+for _, checkpoint in pairs(workspace:GetChildren()) do
+    if checkpoint:IsA("Part") and checkpoint.Name:match("^Checkpoint%d+$") then
+        checkpoint.Touched:Connect(function(hit)
+            local player = game.Players:GetPlayerFromCharacter(hit.Parent)
+            if player then
+                local number = tonumber(checkpoint.Name:match("%d+"))
+                if number and number > player.leaderstats.Stage.Value then
+                    player.leaderstats.Stage.Value = number
+                end
+            end
+        end)
+    end
+end
